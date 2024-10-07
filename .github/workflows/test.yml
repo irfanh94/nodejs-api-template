@@ -50,7 +50,10 @@ jobs:
 
       - name: Run tests
         env:
+          APP_SECRET: very-strong-app-secret
           APP_HTTP_PORT: 3000
+          APP_HTTP_BODY_LIMIT: 1mb
+          APP_HTTP_CORS: *
           DATABASE_URL: mysql://testuser:testpassword@127.0.0.1:3306/testdb
           DATABASE_CONNECTION_LIMIT: 1
         run: npm run test
