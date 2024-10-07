@@ -1,0 +1,59 @@
+name: Node.js CI with MySQL
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testdb
+          MYSQL_USER: testuser
+          MYSQL_PASSWORD: testpassword
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping --host=127.0.0.1 --user=testuser --password=testpassword --silent; do
+            echo "Waiting for MySQL to be ready..."
+            sleep 5
+          done
+
+      - name: Run Prisma migrations
+        env:
+          DATABASE_URL: mysql://testuser:testpassword@127.0.0.1:3306/testdb
+        run: npm run db:migration:migrate
+
+      - name: Run tests
+        env:
+          APP_SECRET: very-strong-app-secret
+          APP_HTTP_PORT: 3000
+          APP_HTTP_BODY_LIMIT: 1mb
+          APP_HTTP_CORS: "*"
+          DATABASE_URL: mysql://testuser:testpassword@127.0.0.1:3306/testdb
+          DATABASE_CONNECTION_LIMIT: 1
+        run: npm run test
