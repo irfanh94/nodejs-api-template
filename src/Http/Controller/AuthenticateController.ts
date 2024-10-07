@@ -6,13 +6,16 @@ import {UserRepository} from "../../Db/Repository/UserRepository";
 import {RequestValidatorMiddleware} from "../Middleware/RequestValidatorMiddleware";
 import * as bcrypt from "bcryptjs";
 import {UserAuthentication} from "../../Service/Authentication/UserAuthentication";
+import {JsonResult} from "inversify-express-utils/lib/results";
+import {Logger} from "../../Service/Logger";
 
 @controller("/authenticate")
 export class AuthenticateController extends BaseHttpController {
 
     constructor(
         @inject(UserRepository) private readonly userRepository: UserRepository,
-        @inject(UserAuthentication) private readonly userAuthentication: UserAuthentication
+        @inject(UserAuthentication) private readonly userAuthentication: UserAuthentication,
+        @inject(Logger) private readonly logger: Logger
     ) {
         super();
     }
@@ -23,21 +26,29 @@ export class AuthenticateController extends BaseHttpController {
         body("password").isString().withMessage("password must be string").notEmpty().withMessage("password must not be empty"),
         RequestValidatorMiddleware
     )
-    public async authenticateWithEmailAndPassword(request: Request) {
-        const body = request.body as {email: string, password: string};
+    public async authenticateWithEmailAndPassword(request: Request): Promise<JsonResult> {
+        try {
+            const body = request.body as {email: string, password: string};
 
-        const user = (await this.userRepository.getUserByEmails([body.email])).pop();
+            const user = (await this.userRepository.getUserByEmails([body.email])).pop();
 
-        if (!user)
-            return this.json({code: "wrong_credentials"}, 404);
+            if (!user)
+                return this.json({code: "wrong_credentials"}, 404);
 
-        if (!bcrypt.compareSync(body.password, user.password))
-            return this.json({code: "wrong_credentials"}, 404);
+            if (!bcrypt.compareSync(body.password, user.password))
+                return this.json({code: "wrong_credentials"}, 404);
 
-        return {
-            token: await this.userAuthentication.createToken({id: user.id, email: user.email}),
-            user: user
-        };
+            return this.json({
+                token: await this.userAuthentication.createToken({id: user.id, email: user.email}),
+                user: user
+            });
+        } catch (error) {
+            this.logger.error(error, {processId: request.processId});
+
+            return this.json({
+                code: "internal_server_error"
+            }, 500);
+        }
     }
 
 }

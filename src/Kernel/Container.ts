@@ -9,6 +9,8 @@ import {RequestValidatorMiddleware} from "../Http/Middleware/RequestValidatorMid
 import {AuthenticateController} from "../Http/Controller/AuthenticateController";
 import {AccountController} from "../Http/Controller/AccountController";
 import {Logger} from "../Service/Logger";
+import {SignUpController} from "../Http/Controller/SignUpController";
+import {SignUpService} from "../Service/User/SignUpService";
 
 export const container = new Container();
 
@@ -18,6 +20,7 @@ container.bind(Environment).toSelf();
 container.bind(IndexController).toSelf();
 container.bind(AuthenticateController).toSelf();
 container.bind(AccountController).toSelf();
+container.bind(SignUpController).toSelf();
 
 // controllers middlewares
 container.bind(JwtAuthenticationMiddleware).toSelf();
@@ -26,6 +29,7 @@ container.bind(RequestValidatorMiddleware).toSelf();
 // services
 container.bind(Logger).toSelf();
 container.bind(UserAuthentication).toSelf();
+container.bind(SignUpService).toSelf();
 
 // repository
 container.bind(DbManager).toSelf();

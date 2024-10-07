@@ -1,10 +1,9 @@
-import {Prisma} from "@prisma/client";
-import {GetFindResult} from "@prisma/client/runtime/library";
+import {UserEntity} from "@prisma/client";
 
 export class AuthenticatedUser {
 
     constructor(
-        public readonly user: GetFindResult<Prisma.$UserEntityPayload, any, any>
+        public readonly user: UserEntity
     ) {}
 
 }

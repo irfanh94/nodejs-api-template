@@ -1,6 +1,8 @@
 import {inject, injectable} from "inversify";
 import {DbManager} from "../DbManager";
 import {Prisma} from "@prisma/client";
+import {UuidV7} from "../../Common/UuidV7";
+import {UserEntity} from "@prisma/client";
 
 @injectable()
 export class UserRepository {
@@ -33,4 +35,13 @@ export class UserRepository {
         });
     }
 
+    public createUser(id: UuidV7, email: string, password: string) {
+        return this.dbClient.create({
+            data: {
+                id: id.toString(),
+                email: email,
+                password: password
+            }
+        }) as Promise<UserEntity>;
+    }
 }

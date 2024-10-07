@@ -7,6 +7,7 @@ import {Server} from "http";
 import cors from "cors";
 import {v4 as uuidV4} from "uuid";
 import {Logger} from "../Service/Logger";
+import {DbManager} from "../Db/DbManager";
 const fileUpload = require("express-fileupload");
 
 export class Http {
@@ -15,6 +16,8 @@ export class Http {
     private readonly logger: Logger;
     private readonly server: InversifyExpressServer;
     private readonly application: express.Application;
+    private readonly dbManager: DbManager;
+
     private httpServer: Server|null = null;
 
     constructor(
@@ -22,6 +25,7 @@ export class Http {
     ) {
         this.environment = container.get(Environment);
         this.logger = container.get(Logger);
+        this.dbManager = container.get(DbManager);
 
         this.server = new InversifyExpressServer(container);
 
@@ -70,10 +74,20 @@ export class Http {
         });
     }
 
-    public start(): void {
-        this.httpServer = this.application.listen(this.environment.get(EnvironmentKeys.APP_HTTP_PORT), () => {
-            this.logger.info("http started");
-        });
+    public start(): Promise<void> {
+        return new Promise((resolve) => {
+            this.httpServer = this.application.listen(this.environment.get(EnvironmentKeys.APP_HTTP_PORT), () => {
+                resolve();
+            });
+        })
     }
 
+    public stop(): Promise<void> {
+        return new Promise((resolve) => {
+            this.httpServer?.closeAllConnections();
+            this.httpServer?.close(() => {
+                resolve();
+            });
+        })
+    }
 }
