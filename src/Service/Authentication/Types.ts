@@ -1,4 +1,4 @@
-export type JwtValidated = {
+export type JwtPayload = {
     id: string,
     email: string
 };

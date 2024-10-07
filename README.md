@@ -26,15 +26,22 @@ This repository provides a Node.js API template to help developers set up an API
 - [Authentication](#authentication)
 - [Environment Variables](#environment-variables)
 - [Logging](#logging)
+- [Tests](#tests)
 - [Contributing](#contributing)
 
 ## Getting Started
+
+### Prerequisites
+
+- **Node.js** v18 or higher
+- **NPM** (comes with Node.js)
 
 To get started, clone the repository and install dependencies:
 
 ```bash
 git clone git@github.com:irfanh94/nodejs-api-template.git
 cd nodejs-api-template
+cp .env.dist .env
 npm install
 npm run build
 ```
@@ -66,6 +73,7 @@ npm run start:app
  - `npm run db:models:generate` - generate prisma models
  - `npm run db:migration:create` - create new migration file based on differences between database and schema.prisma file
  - `npm run db:migration:migrate` - execute database migrations
+ - `npm run test` - execute tests
 
 ## Dependency Injection
 
@@ -202,6 +210,31 @@ We use Winston for flexible logging and its configuration is editable under `src
 Default log levels: debug, info, error.
 
 Logs are written to the console but can be configured to write to files or external services.
+
+## Tests
+
+The test suite is located under the `./src/Test` directory and uses the built-in **node:test** and **assert** packages for unit testing.
+
+### Running Tests
+
+To run the tests, use the following command:
+
+```bash
+npm run test
+```
+
+This command will first build the project and then execute the tests.
+
+### Environment Variables for Testing
+You can overwrite the environment variables specifically for testing by creating a .env.test file. This file allows you to define different configurations for the test environment, which will be used only during test execution.
+
+Example .env.test:
+```dotenv
+APP_ENV=test
+APP_HTTP_PORT=3001
+```
+
+By setting up the .env.test file, you ensure that tests run with a separate configuration from your development environment.
 
 ## Contributing
 If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcomed.

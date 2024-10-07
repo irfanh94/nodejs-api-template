@@ -22,8 +22,18 @@ export class Environment {
     constructor() {
         this.env = <EnvironmentVariables>{
             ...config().parsed,
-            ...config({path: process.cwd() + "/.env.local", override: true}).parsed,
-            ...process.env
+            ...config({path: process.cwd() + "/.env.local", override: true}).parsed
+        };
+
+        if (process.env.NODE_ENV === "test")
+            this.env = {
+                ...this.env,
+                ...config({path: process.cwd() + "/.env.test", override: true}).parsed,
+            };
+
+        this.env = {
+            ...this.env,
+            ...(process.env as EnvironmentVariables)
         };
     }
 
