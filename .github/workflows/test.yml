@@ -43,6 +43,11 @@ jobs:
             sleep 5
           done
 
+      - name: Run Prisma migrations
+        env:
+          DATABASE_URL: mysql://testuser:testpassword@127.0.0.1:3306/testdb
+        run: npm run db:migration:migrate
+
       - name: Run tests
         env:
           APP_HTTP_PORT: 3000
