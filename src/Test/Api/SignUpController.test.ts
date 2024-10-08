@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import {afterEach, beforeEach, describe, it} from "node:test";
-import * as assert from "assert"
+import {deepStrictEqual, strictEqual} from "node:assert";
 import {container} from "../../Kernel/Container";
 import {Http} from "../../Kernel/Http";
 import axios from "axios";
@@ -35,9 +35,9 @@ describe("SignUpController", () => {
         it("should return bad request on non-existing data", async () => {
             const response = await requestClient.post("/") as AxiosXHR<ErrorResponse>;
 
-            assert.strictEqual(response.status, 400);
-            assert.strictEqual(response.data.code, "bad_request");
-            assert.deepStrictEqual(response.data.meta, [
+            strictEqual(response.status, 400);
+            strictEqual(response.data.code, "bad_request");
+            deepStrictEqual(response.data.meta, [
                 {
                     location: "body",
                     msg: "email must be valid",
@@ -65,9 +65,9 @@ describe("SignUpController", () => {
                 password: "bar"
             }) as AxiosXHR<ErrorResponse>;
 
-            assert.strictEqual(response.status, 400);
-            assert.strictEqual(response.data.code, "bad_request");
-            assert.deepStrictEqual(response.data.meta, [
+            strictEqual(response.status, 400);
+            strictEqual(response.data.code, "bad_request");
+            deepStrictEqual(response.data.meta, [
                 {
                     location: "body",
                     msg: "email must be valid",
@@ -91,13 +91,13 @@ describe("SignUpController", () => {
 
             const responseWithOk = await requestClient.post("/", {email, password}) as AxiosXHR<ErrorResponse>;
 
-            assert.strictEqual(responseWithOk.status, 200);
+            strictEqual(responseWithOk.status, 200);
 
             const responseWithError = await requestClient.post("/", {email, password}) as AxiosXHR<ErrorResponse>;
 
-            assert.strictEqual(responseWithError.status, 422);
-            assert.strictEqual(responseWithError.data.code, "user_exists");
-            assert.strictEqual(responseWithError.data.meta, undefined);
+            strictEqual(responseWithError.status, 422);
+            strictEqual(responseWithError.data.code, "user_exists");
+            strictEqual(responseWithError.data.meta, undefined);
         });
 
         it('should return user data on sign-up', async () => {
@@ -115,12 +115,12 @@ describe("SignUpController", () => {
 
             const responseToken = container.get(UserAuthentication).verifyToken(responseWithOk.data.token);
 
-            assert.strictEqual(responseWithOk.status, 200);
-            assert.strictEqual(email.toLowerCase(), responseToken?.email);
-            assert.strictEqual(true, validate(responseToken?.id ?? ""));
-            assert.strictEqual(true, validate(responseWithOk.data.user.id));
-            assert.strictEqual(email.toLowerCase(), responseWithOk.data.user.email);
-            assert.strictEqual(true, compareSync(password, responseWithOk.data.user.password));
+            strictEqual(responseWithOk.status, 200);
+            strictEqual(email.toLowerCase(), responseToken?.email);
+            strictEqual(true, validate(responseToken?.id ?? ""));
+            strictEqual(true, validate(responseWithOk.data.user.id));
+            strictEqual(email.toLowerCase(), responseWithOk.data.user.email);
+            strictEqual(true, compareSync(password, responseWithOk.data.user.password));
         });
     });
 });

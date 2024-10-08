@@ -5,7 +5,7 @@
     "db:models:generate": "npx prisma generate",
     "db:migration:create": "npx prisma migrate dev --create-only",
     "db:migration:migrate": "npx prisma migrate deploy",
-    "test": "npm run build && NODE_ENV=test node ./build/Test/**/*.test.js"
+    "test": "npm run build && NODE_ENV=test find . -name \"*.test.js\" | xargs -n 1 node"
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",
