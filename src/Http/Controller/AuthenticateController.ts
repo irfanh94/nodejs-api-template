@@ -33,10 +33,10 @@ export class AuthenticateController extends BaseHttpController {
             const user = (await this.userRepository.getUserByEmails([body.email])).pop();
 
             if (!user)
-                return this.json({code: "wrong_credentials"}, 404);
+                return this.json({code: "wrong_credentials"}, 401);
 
             if (!bcrypt.compareSync(body.password, user.password))
-                return this.json({code: "wrong_credentials"}, 404);
+                return this.json({code: "wrong_credentials"}, 401);
 
             return this.json({
                 token: await this.userAuthentication.createToken({id: user.id, email: user.email}),

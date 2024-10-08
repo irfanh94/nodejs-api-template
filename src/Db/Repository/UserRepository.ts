@@ -44,4 +44,14 @@ export class UserRepository {
             }
         }) as Promise<UserEntity>;
     }
+
+    public deleteUsers(ids: UuidV7[]) {
+        return this.dbClient.deleteMany({
+            where: {
+                id: {
+                    in: ids.map(id => id.toString())
+                }
+            }
+        })
+    }
 }
